@@ -86,7 +86,7 @@ func (this *ApicurioRegistryReconciler) Reconcile(reconcileCtx ctx.Context /* TO
 	appName := common.Name(request.Name)
 	appNamespace := common.Namespace(request.Namespace)
 
-	this.log.Info("Reconciler executing. dev-j-0.1")
+	this.log.Info("Reconciler executing. dev-j-fix-logs-v1")
 
 	// Find the spec
 	spec, err := this.getApicurioRegistryResource(appNamespace, appName)
