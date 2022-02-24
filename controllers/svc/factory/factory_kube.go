@@ -70,6 +70,14 @@ func (this *KubeFactory) createObjectMeta(typeTag string) meta.ObjectMeta {
 	}
 }
 
+func (this *KubeFactory) createSimpleObjectMeta() meta.ObjectMeta {
+	return meta.ObjectMeta{
+		Name:      this.ctx.GetAppName().Str(),
+		Namespace: this.ctx.GetAppNamespace().Str(),
+		Labels:    this.GetLabels(),
+	}
+}
+
 func (this *KubeFactory) CreateDeployment() *apps.Deployment {
 	var terminationGracePeriodSeconds int64 = 30
 	var replicas int32 = 1
@@ -142,6 +150,7 @@ func (this *KubeFactory) CreateDeployment() *apps.Deployment {
 					RestartPolicy:                 core.RestartPolicyAlways,
 					TerminationGracePeriodSeconds: &terminationGracePeriodSeconds,
 					DNSPolicy:                     core.DNSClusterFirst,
+					ServiceAccountName:            this.ctx.GetAppName().Str(),
 					Volumes: []core.Volume{
 						core.Volume{
 							Name:         "tmp",
@@ -176,6 +185,16 @@ func (this *KubeFactory) CreateService() *core.Service {
 			Type:            core.ServiceTypeClusterIP,
 			SessionAffinity: core.ServiceAffinityNone,
 		},
+	}
+	return service
+}
+
+func (this *KubeFactory) CreateServiceAccount() *core.ServiceAccount {
+	service := &core.ServiceAccount{
+		TypeMeta:         meta.TypeMeta{},
+		ObjectMeta:       this.createSimpleObjectMeta(),
+		Secrets:          []core.ObjectReference{},
+		ImagePullSecrets: []core.LocalObjectReference{},
 	}
 	return service
 }

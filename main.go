@@ -82,7 +82,7 @@ func main() {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
-	logger := builldLogger()
+	logger := buildLogger()
 	ctrl.SetLogger(logger)
 
 	namespaces, err := getWatchNamespace()
@@ -142,7 +142,7 @@ func getWatchNamespace() (string, error) {
 	return ns, nil
 }
 
-func builldLogger() logr.Logger {
+func buildLogger() logr.Logger {
 	configLog := uzap.NewProductionEncoderConfig()
 	configLog.EncodeTime = func(ts time.Time, encoder zapcore.PrimitiveArrayEncoder) {
 		encoder.AppendString(ts.UTC().Format(time.RFC3339Nano))

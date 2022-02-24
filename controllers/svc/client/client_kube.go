@@ -3,6 +3,7 @@ package client
 import (
 	ctx "context"
 	"errors"
+
 	"github.com/Apicurio/apicurio-registry-operator/controllers/common"
 	"github.com/Apicurio/apicurio-registry-operator/controllers/loop/context"
 	apps "k8s.io/api/apps/v1"
@@ -112,6 +113,48 @@ func (this *KubeClient) GetServices(namespace common.Namespace, options *meta.Li
 
 func (this *KubeClient) DeleteService(value *core.Service, options *meta.DeleteOptions) error {
 	return this.client.CoreV1().Services(value.Namespace).Delete(ctx.TODO(), value.Name, *options)
+}
+
+// ===
+// Service Account
+
+func (this *KubeClient) CreateServiceAccount(namespace common.Namespace, value *core.ServiceAccount) (*core.ServiceAccount, error) {
+	spec := getSpec(this.ctx)
+	if spec == nil {
+		return nil, errors.New("Could not find ApicurioRegistry. Retrying.")
+	}
+	if err := controllerutil.SetControllerReference(spec, value, this.ctx.GetScheme()); err != nil {
+		return nil, err
+	}
+	res, err := this.client.CoreV1().ServiceAccounts(namespace.Str()).Create(ctx.TODO(), value, meta.CreateOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (this *KubeClient) GetServiceAccount(namespace common.Namespace, name common.Name, options *meta.GetOptions) (*core.ServiceAccount, error) {
+	return this.client.CoreV1().ServiceAccounts(namespace.Str()).
+		Get(ctx.TODO(), name.Str(), meta.GetOptions{})
+}
+
+func (this *KubeClient) UpdateServiceAccount(namespace common.Namespace, value *core.ServiceAccount) (*core.ServiceAccount, error) {
+	return this.client.CoreV1().ServiceAccounts(namespace.Str()).
+		Update(ctx.TODO(), value, meta.UpdateOptions{})
+}
+
+func (this *KubeClient) PatchServiceAccount(namespace common.Namespace, name common.Name, patchData []byte) (*core.ServiceAccount, error) {
+	return this.client.CoreV1().ServiceAccounts(namespace.Str()).
+		Patch(ctx.TODO(), name.Str(), types.StrategicMergePatchType, patchData, meta.PatchOptions{})
+}
+
+func (this *KubeClient) GetServiceAccounts(namespace common.Namespace, options *meta.ListOptions) (*core.ServiceAccountList, error) {
+	return this.client.CoreV1().ServiceAccounts(namespace.Str()).
+		List(ctx.TODO(), *options)
+}
+
+func (this *KubeClient) DeleteServiceAccount(value *core.ServiceAccount, options *meta.DeleteOptions) error {
+	return this.client.CoreV1().ServiceAccounts(value.Namespace).Delete(ctx.TODO(), value.Name, *options)
 }
 
 // ===

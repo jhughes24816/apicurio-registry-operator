@@ -203,6 +203,9 @@ func (this *ApicurioRegistryReconciler) createNewLoop(appName common.Name, appNa
 	//service
 	c.AddControlFunction(cf.NewServiceCF(ctx, loopServices))
 
+	//service account
+	c.AddControlFunction(cf.NewServiceAccountCF(ctx, loopServices))
+
 	//ingress (depends on service)
 	c.AddControlFunction(cf.NewIngressCF(ctx, loopServices))
 
